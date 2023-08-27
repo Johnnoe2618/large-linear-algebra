@@ -15,9 +15,8 @@ The extension provides efficient representations for the algebraic manipulation 
 - Iterative solvers for Dense and Sparse Matrices, using the Conjugate Gradient Method.
 
 ## Documentation
-
-
+Documentation can be found on the [GitHub Wiki](https://github.com/Johnnoe2618/large-linear-algebra/wiki)
 
 ## Compilation of Dynamically Linked Libraries from Source
-If you are using this extension on a platform where precompiled binaries have not been provided (currently windows), you must compile them yourself from the *stable* branch repository.
+If you are using this extension on a platform where precompiled binaries have not been provided (only provided currently for windows), you must compile them yourself from the *stable* branch repository.
 The SConstruct file for building the extension is within addons/largelinearalgebra. It is a derivative of the template provided from the [Godot Documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html).
