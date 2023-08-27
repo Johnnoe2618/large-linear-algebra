@@ -1,0 +1,36 @@
+# C++ Compilation Ignores
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.exp
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Vs Code
+.vscode
+addons/largelinearalgebra/.vscode
+addons/largelinearalgebra/src/.vscode
+
+# Godot Ignores
+.godot/
+.import/
+export.cfg
+export_presets.cfg

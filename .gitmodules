@@ -1,0 +1,4 @@
+[submodule "addons/largelinearalgebra/godot-cpp"]
+	path = addons/largelinearalgebra/godot-cpp
+	url = https://github.com/godotengine/godot-cpp
+	branch = 4.1

@@ -1,0 +1,14 @@
+# Normalize EOL for all files that Git considers text files.
+* text=auto eol=lf
+
+# Prevent export of test project files, and other metadata, to simplify the Asset Library export.
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/.gitmodules        export-ignore
+/.github            export-ignore
+/CHANGELOG.md       export-ignore
+/README.md          export-ignore
+/LICENSE.md         export-ignore
+/project.godot      export-ignore
+/test_scene.scn      export-ignore
+/test_script.gd      export-ignore
