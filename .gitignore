@@ -34,3 +34,7 @@ addons/largelinearalgebra/src/.vscode
 .import/
 export.cfg
 export_presets.cfg
+
+# Scons Ignores
+addons/largelinearalgebra/.sconsign.dblite
+

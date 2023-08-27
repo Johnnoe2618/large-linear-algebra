@@ -21,7 +21,7 @@ private:
     // helper functions for matrix internal manipulations
     _FORCE_INLINE_ void blit_rect_unsafe(const DenseMatrix& source, Rect2i src_rect, Vector2i dst); // x is the row, y is the column
     _FORCE_INLINE_ void blit_rect_unsafe_ref(Ref<DenseMatrix> source, Rect2i src_rect, Vector2i dst);
-    _FORCE_INLINE_ void swap_rows_after_col(int row_a, int row_b, int first_col);
+    _FORCE_INLINE_ void swap_rows(int row_a, int row_b);
     _FORCE_INLINE_ void multiply_row_after_col(int row, double coefficient, int first_col);
     _FORCE_INLINE_ void add_row_multiple_after_col(int row_dest, int row_src, double multiple, int first_col);
     _FORCE_INLINE_ double& get_cell_unsafe(int row, int col) { return values[col_number * row + col]; };

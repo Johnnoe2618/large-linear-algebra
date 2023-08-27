@@ -584,7 +584,7 @@ Ref<VectorN> SparseMatrix::multiply_vector(Ref<VectorN> other) const {
 	result.instantiate();
 	result->values.resize(values.size());
 
-    for (int row = 0; row < column_number; row++) {
+    for (int row = 0; row < values.size(); row++) {
         double total = 0.0;
 
         for (auto& col : values[row]) {
@@ -629,6 +629,7 @@ Ref<VectorN> SparseMatrix::solve_iterative_cg(Ref<VectorN> B, Ref<VectorN> initi
 	}
 
 	if (max_iterations > column_number) max_iterations = column_number; // the conjugate method is theoretically perfect after N steps
+    if (max_iterations < 0) max_iterations = column_number;
 
 	// algorithm was stolen from Wikipedia: (https://en.wikipedia.org/wiki/Conjugate_gradient_method)
 
@@ -637,7 +638,7 @@ Ref<VectorN> SparseMatrix::solve_iterative_cg(Ref<VectorN> B, Ref<VectorN> initi
 	Ref<VectorN> P = R->clone();
 
 	for (int i = 0; i < max_iterations; i++) {
-		if (R->is_approximately_zero(std::numeric_limits<double>::epsilon() * 4.0)) break;
+		if (R->is_approximately_zero(std::numeric_limits<double>::epsilon())) break;
 
 		Ref<VectorN> Ap = multiply_vector(P);
 		double RR = R->dot(R);

@@ -18,5 +18,7 @@ The extension provides efficient representations for the algebraic manipulation 
 Documentation can be found on the [GitHub Wiki](https://github.com/Johnnoe2618/large-linear-algebra/wiki)
 
 ## Compilation of Dynamically Linked Libraries from Source
-If you are using this extension on a platform where precompiled binaries have not been provided (only provided currently for windows), you must compile them yourself from the *stable* branch repository.
+If you are using this extension on a platform where precompiled binaries have not been provided (only provided currently for windows), you must compile them yourself from this repository.
 The SConstruct file for building the extension is within addons/largelinearalgebra. It is a derivative of the template provided from the [Godot Documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/gdextension_cpp_example.html).
+
+To compile the binaries, go to the extension directory in the command prompt, and run ``scons platform=[platform] target=[template_debug|template_release]``. Then, for the resulting binary in the ``bin`` directory, add the platform to the ``largelinearalgebra.gdextension`` file.

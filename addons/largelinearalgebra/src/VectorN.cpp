@@ -17,8 +17,7 @@ void VectorN::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_element", "index"), &VectorN::get_element);
 
 	ClassDB::bind_method(D_METHOD("dot", "other"), &VectorN::dot);
-	ClassDB::bind_method(D_METHOD("length_squared"), &VectorN::length_squared);
-	ClassDB::bind_method(D_METHOD("length"), &VectorN::length);
+	ClassDB::bind_method(D_METHOD("normalise"), &VectorN::normalise);
 	ClassDB::bind_method(D_METHOD("add", "other"), &VectorN::add);
 	ClassDB::bind_method(D_METHOD("subtract", "other"), &VectorN::subtract);
 	ClassDB::bind_method(D_METHOD("add_in_place", "other"), &VectorN::add_in_place);
@@ -26,8 +25,11 @@ void VectorN::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("add_multiple_in_place", "vector", "multiple"), &VectorN::add_multiple_in_place);
 	ClassDB::bind_method(D_METHOD("multiply_scalar_in_place", "scalar"), &VectorN::multiply_scalar_in_place);
 
+	ClassDB::bind_method(D_METHOD("length_squared"), &VectorN::length_squared);
+	ClassDB::bind_method(D_METHOD("length"), &VectorN::length);
 	ClassDB::bind_method(D_METHOD("column_vector"), &VectorN::column_vector);
 	ClassDB::bind_method(D_METHOD("row_vector"), &VectorN::row_vector);
+	ClassDB::bind_method(D_METHOD("to_packed_array"), &VectorN::to_packed_array);
 }
 
 Ref<VectorN> VectorN::filled(double value, int size) {
@@ -60,7 +62,11 @@ void VectorN::resize(int size) {
 		ERR_PRINT_ED("ERROR: cannot set dimensions to negative.");
 		return;
 	}
-	values.resize(size);
+	values.resize(size, 0.0);
+}
+
+void VectorN::normalise() {
+	multiply_scalar_in_place(1.0/length());
 }
 
 double VectorN::dot(Ref<VectorN> other) const {
@@ -117,13 +123,8 @@ double VectorN::get_element(int idx) const {
 
 double VectorN::length_squared() const {
 	double total = 0.0;
-	int square_block = values.size() & ~(0b11);
-	// for the initial block that can be vectorised
-	for (int i = 0; i < square_block; i+=4) {
-		total += (values[i]*values[i] + values[i+1]*values[i+1]) + (values[i+2]*values[i+2] + values[i+3]*values[i+3]); // This is not yet vectorised, however, this avoids read-write conflicts. TODO: vectorise this
-	}
-	// for the remainder that cannot be vectorised easily
-	for (int i = square_block; i < values.size(); i++) {
+	
+	for (int i = 0; i < values.size(); i++) {
 		total += values[i] * values[i];
 	}
 
@@ -264,9 +265,19 @@ bool VectorN::is_approximately_zero(double threshold) const {
 	double sum_so_far = 0.0;
 
 	for (int i = 0; i < values.size(); i++) {
-		sum_so_far += values[i];
-		if (sum_so_far > threshold) return false;
+		sum_so_far += abs(values[i]);
+		if (sum_so_far >= threshold) return false;
 	}
 
 	return true;
+}
+
+PackedFloat64Array VectorN::to_packed_array() const {
+	PackedFloat64Array result;
+	result.resize(values.size());
+	for (int i = 0; i < values.size(); i++) {
+		result[i] = values[i];
+	}
+
+	return result;
 }

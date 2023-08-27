@@ -36,8 +36,7 @@ public:
     double get_element(int idx) const;
 
     double dot(Ref<VectorN> other) const;
-    double length_squared() const;
-    double length() const;
+    void normalise();
 
     Ref<VectorN> add(Ref<VectorN> other) const;
     Ref<VectorN> subtract(Ref<VectorN> other) const;
@@ -46,9 +45,12 @@ public:
     void add_multiple_in_place(Ref<VectorN> other, double multiple);
     void multiply_scalar_in_place(double scalar);
 
+    double length_squared() const;
+    double length() const;
     Ref<DenseMatrix> column_vector() const;
     Ref<DenseMatrix> row_vector() const;
 
+    PackedFloat64Array to_packed_array() const;
 };
 
 }

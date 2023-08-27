@@ -2,13 +2,14 @@
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>
+#include <string>
 
 using namespace godot;
 
 void DenseMatrix::_bind_methods() {
 	ClassDB::bind_static_method("DenseMatrix", D_METHOD("identity", "size"), &DenseMatrix::identity);
 	ClassDB::bind_static_method("DenseMatrix", D_METHOD("zero", "size"), &DenseMatrix::zero);
-	ClassDB::bind_static_method("DenseMatrix", D_METHOD("from_packed_array", "array"), &DenseMatrix::from_packed_array);
+	ClassDB::bind_static_method("DenseMatrix", D_METHOD("from_packed_array", "array", "rows", "columns"), &DenseMatrix::from_packed_array);
 
 	ClassDB::bind_method(D_METHOD("set_dimensions", "rows", "columns"), &DenseMatrix::set_dimensions);
 	ClassDB::bind_method(D_METHOD("get_dimensions"), &DenseMatrix::get_dimensions);
@@ -66,8 +67,8 @@ void DenseMatrix::blit_rect_unsafe_ref(Ref<DenseMatrix> source, Rect2i src_rect,
 	}
 }
 
-void DenseMatrix::swap_rows_after_col(int row_a, int row_b, int first_col) {
-	for (int i = first_col; i < col_number; i++) {
+void DenseMatrix::swap_rows(int row_a, int row_b) {
+	for (int i = 0; i < col_number; i++) {
 		double a = values[col_number * row_a + i];
 		values[col_number * row_a + i] = values[col_number * row_b + i];
 		values[col_number * row_b + i] = a;
@@ -253,23 +254,8 @@ Ref<DenseMatrix> DenseMatrix::multiply_dense(Ref<DenseMatrix> other) const {
 	for (int row = 0; row < row_number; row++) {
 		for (int col = 0; col < other->col_number; col++) {
 			double total = 0.0;
-			int square_block = row_number & ~(0b11);
-			// for the initial block that can be vectorised
-			for (int i = 0; i < square_block; i+=4) {
-				double a1,b1,c1,d1, a2,b2, c2, d2;
-				a1 = values[col_number * row + i];
-				b1 = values[col_number * row + i + 1];
-				c1 = values[col_number * row + i + 2];
-				d1 = values[col_number * row + i + 3];
-				a2 = other->values[other->col_number * i + col];
-				b2 = other->values[other->col_number * (i + 1) + col];
-				c2 = other->values[other->col_number * (i + 2) + col];
-				d2 = other->values[other->col_number * (i + 3) + col];
 
-				total += (a1*a2 + b1*b2) + (c1*c2 + d1*d2); // This is not yet vectorised, however, this avoids read-write conflicts. TODO: vectorise this
-			}
-			// for the remainder that cannot be vectorised easily
-			for (int i = square_block; i < row_number; i++) {
+			for (int i = 0; i < col_number; i++) {
 				total += values[col_number * row + i] * other->values[other->col_number * i + col];
 			}
 
@@ -326,7 +312,7 @@ Ref<DenseMatrix> DenseMatrix::add_sparse(Ref<SparseMatrix> other) const {
 		return null_ref;
     }
 
-	Ref<DenseMatrix> result = other->clone(); // clone values (many of them won't be touched. Only a few will be editted by the sparse matrix)
+	Ref<DenseMatrix> result = clone(); // clone values (many of them won't be touched. Only a few will be editted by the sparse matrix)
 	for (int row = 0; row < row_number; row++) {
 		for (auto& col : other->values[row]) {
 			result->values[col_number * row + col.column] += col.val;
@@ -348,7 +334,7 @@ Ref<DenseMatrix> DenseMatrix::subtract_sparse(Ref<SparseMatrix> other) const {
 		return null_ref;
     }
 
-	Ref<DenseMatrix> result = other->clone(); // clone values (many of them won't be touched. Only a few will be editted by the sparse matrix)
+	Ref<DenseMatrix> result = clone(); // clone values (many of them won't be touched. Only a few will be editted by the sparse matrix)
 	for (int row = 0; row < row_number; row++) {
 		for (auto& col : other->values[row]) {
 			result->values[col_number * row + col.column] -= col.val;
@@ -471,13 +457,7 @@ void DenseMatrix::subtract_dense_in_place(Ref<DenseMatrix> other) {
 double DenseMatrix::norm_squared() const {
 	double total = 0.0;
 
-	int square_block = values.size() & ~(0b11);
-	// for the initial block that can be vectorised
-	for (int i = 0; i < square_block; i+=4) {
-		total += (values[i]*values[i] + values[i+1]*values[i+1]) + (values[i+2]*values[i+2] + values[i+3]*values[i+3]); // This is not yet vectorised, however, this avoids read-write conflicts. TODO: vectorise this
-	}
-	// for the remainder that cannot be vectorised easily
-	for (int i = square_block; i < values.size(); i++) {
+	for (int i = 0; i < values.size(); i++) {
 		total += values[i] * values[i];
 	}
 
@@ -504,26 +484,10 @@ Ref<VectorN> DenseMatrix::multiply_vector(Ref<VectorN> other) const {
 	result.instantiate();
 	result->values.resize(row_number);
 
-	int square_block = col_number & ~(0b11);
-	for (int row = 0; row < col_number; row++) {
+	for (int row = 0; row < row_number; row++) {
 		double total = 0.0;
 
-		// for the initial block that can be vectorised
-		for (int col = 0; col < square_block; col+=4) {
-			double a1,b1,c1,d1, a2,b2, c2, d2;
-			a1 = values[col_number * row + col];
-			b1 = values[col_number * row + col + 1];
-			c1 = values[col_number * row + col + 2];
-			d1 = values[col_number * row + col + 3];
-			a2 = other->values[col];
-			b2 = other->values[col + 1];
-			c2 = other->values[col + 2];
-			d2 = other->values[col + 3];
-
-			total += (a1*a2 + b1*b2) + (c1*c2 + d1*d2); // This is not yet vectorised, however, this avoids read-write conflicts. TODO: vectorise this
-		}
-		// for the remainder that cannot be vectorised easily
-		for (int col = square_block; col < col_number; col++) {
+		for (int col = 0; col < col_number; col++) {
 			total += values[col_number * row + col] * other->values[col];
 		}
 
@@ -576,25 +540,30 @@ Ref<DenseMatrix> DenseMatrix::solve(Ref<DenseMatrix> B) const {
 	result.instantiate();
 	result->set_dimensions(row_number, col_number + B->col_number); // create it as an augmented matrix
 	result->blit_rect_unsafe(*this, Rect2i(0, 0, row_number, row_number), Vector2i(0, 0)); // add the current matrix into the LHS
-	result->blit_rect_unsafe(*this, Rect2i(0, 0, B->row_number, B->col_number), Vector2i(0, col_number)); // add the solution matrix into the RIGHT of the augmented
+	result->blit_rect_unsafe(*B.ptr(), Rect2i(0, 0, B->row_number, B->col_number), Vector2i(0, col_number)); // add the solution matrix into the RIGHT of the augmented
+
+	std::string return_string = "";
+	auto matrix_values = result->to_packed_array();
+	
 
 	for (int row = 0; row < row_number; row++) {
 		// step 1: search for the pivot element (greatest element), in rows including this, and above
 		int pivot = row;
 		double pivot_value = result->get_cell_unsafe(row, row);
-		for (int search_row = row + 1; row < row_number; row++) {
+		for (int search_row = row + 1; search_row < row_number; search_row++) {
 			double search_value = result->get_cell_unsafe(search_row, row);
 			if (search_value > pivot_value) {
 				pivot_value = search_value;
 				pivot = search_row;
 			}
 		}
+
 		if (pivot != row) { // then switch the selected pivot row to the top
-			result->swap_rows_after_col(row, pivot, row); // "after col" is inclusive
+			result->swap_rows(row, pivot); // "after col" is inclusive
 		}
 
 		// Now that a good pivot has been selected at the top of the current working row, then start.
-		if (std::abs(pivot_value) < std::numeric_limits<double>::epsilon() * 1.0) { // check if the pivot equals zero. A value of atleast 1, or higher, is extremely likely. So, this epsilon factor is used.
+		if (std::abs(pivot_value) < std::numeric_limits<double>::epsilon()) { // check if the pivot equals zero. A value of atleast 1, or higher, is extremely likely. So, this epsilon factor is used.
 			Ref<DenseMatrix> empty_ref; // null reference (can be compared in Godot using == null). This is the failure case.
 			WARN_PRINT_ED("ERROR: this matrix is non-invertible/degenerate. Returned null.");
 			return empty_ref;
@@ -665,6 +634,7 @@ Ref<VectorN> DenseMatrix::solve_iterative_cg(Ref<VectorN> B, Ref<VectorN> initia
 	}
 
 	if (max_iterations > row_number) max_iterations = row_number; // the conjugate method is theoretically perfect after N steps
+	if (max_iterations < 0) max_iterations = row_number;
 
 	// algorithm was stolen from Wikipedia: (https://en.wikipedia.org/wiki/Conjugate_gradient_method)
 
@@ -673,7 +643,9 @@ Ref<VectorN> DenseMatrix::solve_iterative_cg(Ref<VectorN> B, Ref<VectorN> initia
 	Ref<VectorN> P = R->clone();
 
 	for (int i = 0; i < max_iterations; i++) {
-		if (R->is_approximately_zero(std::numeric_limits<double>::epsilon() * 4.0)) break;
+		if (R->is_approximately_zero(std::numeric_limits<double>::epsilon())) {
+			break;
+		}
 
 		Ref<VectorN> Ap = multiply_vector(P);
 		double RR = R->dot(R);
