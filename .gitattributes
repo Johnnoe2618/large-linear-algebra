@@ -12,3 +12,4 @@
 /project.godot      export-ignore
 /test_scene.scn      export-ignore
 /test_script.gd      export-ignore
+/addons/largelinearalgebra/godot-cpp export-ignore
