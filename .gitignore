@@ -36,5 +36,5 @@ export.cfg
 export_presets.cfg
 
 # Scons Ignores
-addons/largelinearalgebra/.sconsign.dblite
+.sconsign.dblite
 
