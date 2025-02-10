@@ -1,6 +1,6 @@
 extends Node2D
 
-func _ready():
+func basic_regression_tests():
 	## Creating the Matrices
 	assert(Array(DenseMatrix.identity(3).to_packed_array()).hash() == [1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0].hash())
 	assert(Array(DenseMatrix.zero(2).to_packed_array()).hash() == [0.0,0.0,0.0,0.0].hash())
@@ -100,6 +100,25 @@ func _ready():
 	new_matrix_again.set_element(0,0,0.5)
 	new_matrix_again.set_element(1,2,2.5)
 	new_matrix_again.multiply_scaler_in_place(3)
-	assert(Array(new_matrix_again.to_dense().to_packed_array()).hash() == [1.5, 0.0, 0.0, 0.0, 0.0, 7.5].hash())
+	assert(Array(new_matrix_again.to_dense().to_packed_array()).hash() == [1.5, 0.0, 0.0, 0.0, 0.0, 7.5].hash())	
+
+
+func bug_fix_regression_tests():
+	# Related GitHub Issue: #3
+	var dense_negative =  DenseMatrix.from_packed_array([
+		-0.4, 0.9, 0,
+		-0.9, -0.1, 0,
+		0, 0, 1
+		], 3, 3)
 	
+	var expected_inverse = [
+		-0.117647, -1.058823, 0,
+		1.05882, -0.47058, 0,
+		0, 0, 1
+	]
 	
+	print(dense_negative.inverse().to_packed_array(), " should be approximately ", expected_inverse)
+
+func _ready():
+	basic_regression_tests()
+	bug_fix_regression_tests()

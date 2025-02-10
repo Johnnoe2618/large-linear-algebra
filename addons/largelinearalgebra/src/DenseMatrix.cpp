@@ -506,7 +506,7 @@ Ref<SparseMatrix> DenseMatrix::to_sparse(double zero_threshold) const {
 		for (int col = 0; col < col_number; col++) {
 			double value = values[col_number * row + col];
 
-			if (value > zero_threshold) {
+			if (std::abs(value) > zero_threshold) {
 				Value newvalue;
 				newvalue.val = value;
 				newvalue.column = col;
@@ -547,12 +547,12 @@ Ref<DenseMatrix> DenseMatrix::solve(Ref<DenseMatrix> B) const {
 	
 
 	for (int row = 0; row < row_number; row++) {
-		// step 1: search for the pivot element (greatest element), in rows including this, and above
+		// step 1: search for the pivot element (value with the largest magnitude), in rows including this, and above
 		int pivot = row;
 		double pivot_value = result->get_cell_unsafe(row, row);
 		for (int search_row = row + 1; search_row < row_number; search_row++) {
 			double search_value = result->get_cell_unsafe(search_row, row);
-			if (search_value > pivot_value) {
+			if (std::abs(search_value) > std::abs(pivot_value)) {
 				pivot_value = search_value;
 				pivot = search_row;
 			}
@@ -633,7 +633,7 @@ Ref<VectorN> DenseMatrix::solve_iterative_cg(Ref<VectorN> B, Ref<VectorN> initia
 		initial_guess = VectorN::filled(0.0, B->values.size());
 	}
 
-	if (max_iterations > row_number) max_iterations = row_number; // the conjugate method is theoretically perfect after N steps
+	if (max_iterations > row_number) max_iterations = row_number; // the conjugate method is theoretically perfect after N steps (for positive-definite matrices)
 	if (max_iterations < 0) max_iterations = row_number;
 
 	// algorithm was stolen from Wikipedia: (https://en.wikipedia.org/wiki/Conjugate_gradient_method)

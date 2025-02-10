@@ -24,6 +24,9 @@
 *.out
 *.app
 
+# Misc
+*.tmp
+
 # Vs Code
 .vscode
 addons/largelinearalgebra/.vscode
