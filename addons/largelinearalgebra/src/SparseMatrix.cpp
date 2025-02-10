@@ -1,4 +1,6 @@
+#include "DenseMatrix.h"
 #include "SparseMatrix.h"
+#include "VectorN.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/error_macros.hpp>

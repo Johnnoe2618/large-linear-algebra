@@ -1,9 +1,7 @@
 #ifndef VECTOR_N_H
 #define VECTOR_N_H
 
-#include "DenseMatrix.h"
-#include "SparseMatrix.h"
-#include <godot_cpp/classes/ref.hpp>
+#include "Declarations.h"
 #include <vector>
 
 namespace godot {

@@ -1,9 +1,7 @@
 #ifndef SPARSE_MATRIX_H
 #define SPARSE_MATRIX_H
 
-#include "DenseMatrix.h"
-#include "VectorN.h"
-#include <godot_cpp/classes/ref.hpp>
+#include "Declarations.h"
 #include <vector>
 
 namespace godot {

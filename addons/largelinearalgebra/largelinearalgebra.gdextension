@@ -5,3 +5,6 @@ compatibility_minimum = 4.1
 [libraries]
 windows.debug.x86_64 = "res://addons/largelinearalgebra/bin/largelinearalgebra.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://addons/largelinearalgebra/bin/largelinearalgebra.windows.template_release.x86_64.dll"
+
+linux.debug.x86_64 = "res://addons/largelinearalgebra/bin/liblargelinearalgebra.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://addons/largelinearalgebra/bin/liblargelinearalgebra.linux.template_release.x86_64.so"
