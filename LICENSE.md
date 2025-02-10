@@ -1,6 +1,6 @@
 Boost Software License - Version 1.0 - August 17th, 2003
 
-Copyright (c) 2023 John Gray
+Copyright (c) 2023-2025 John Gray
 
 Permission is hereby granted, free of charge, to any person or organization
 obtaining a copy of the software and accompanying documentation covered by
