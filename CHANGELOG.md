@@ -18,3 +18,6 @@ Initial Release
 - Bug Fix (DenseMatrix.solve/DenseMatrix.inverse): pivot selection error when a column contains no positive numbers.
 - Bug Fix: Conversion from DenseMatrix to SparseMatrix now correctly works with negatives.
 - Add Linux binary to extension.
+
+## Version 1.0.2
+- Bug Fix (VectorN.dot): was broken for N > 3

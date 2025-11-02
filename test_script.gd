@@ -51,8 +51,15 @@ func basic_regression_tests():
 	assert(Array(in_place_test.to_packed_array()).hash() == [0.0, 0.0, 0.0, 0.0].hash())
 	
 	assert(Array(new_clone.solve(VectorN.from_packed_array([1.0, 1.0]).column_vector()).to_packed_array()).hash() == [5.8/0.58, -7.7/0.58].hash())
-	print((DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2)).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).to_packed_array(), " should be approximately ", [1.09375, -0.28125])
+	print(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).to_packed_array(), " should be approximately ", [1.09375, -0.28125])
+	
+	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.000002)
+	
+	
+	
 	print((DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).to_sparse(0.0)).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).to_packed_array(), " should be approximately ", [1.09375, -0.28125])
+	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).to_sparse(0.0).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.000002)
+	
 	
 	assert(DenseMatrix.from_packed_array([3.0, 1.0, 2.0, -1.0], 2, 2).norm_squared() == 15.0)
 	assert(DenseMatrix.from_packed_array([3.0, 1.0, 2.0, -1.0], 2, 2).norm() == sqrt(15.0))
@@ -100,7 +107,15 @@ func basic_regression_tests():
 	new_matrix_again.set_element(0,0,0.5)
 	new_matrix_again.set_element(1,2,2.5)
 	new_matrix_again.multiply_scaler_in_place(3)
-	assert(Array(new_matrix_again.to_dense().to_packed_array()).hash() == [1.5, 0.0, 0.0, 0.0, 0.0, 7.5].hash())	
+	assert(Array(new_matrix_again.to_dense().to_packed_array()).hash() == [1.5, 0.0, 0.0, 0.0, 0.0, 7.5].hash())
+	
+	assert(Array(VectorN.filled(5, 3).to_packed_array()).hash() == [5.0,5.0,5.0].hash())
+	
+	assert(VectorN.from_packed_array([1,2,3,9,7]).length_squared() == 144)
+	assert(VectorN.from_packed_array([1,2,3,9,7]).length() == 12)
+	
+	assert(VectorN.from_packed_array([1,2,3]).dot(VectorN.from_packed_array([3,2,1])) == 10)
+	assert(VectorN.from_packed_array([1,2,3,7,6]).dot(VectorN.from_packed_array([3,2,1,1,1])) == 23)
 
 
 func bug_fix_regression_tests():
@@ -117,7 +132,14 @@ func bug_fix_regression_tests():
 		0, 0, 1
 	]
 	
-	print(dense_negative.inverse().to_packed_array(), " should be approximately ", expected_inverse)
+	assert(dense_negative.inverse().subtract_dense(DenseMatrix.from_packed_array(expected_inverse,3,3)).norm() < 0.00002)
+	
+	# Related GitHub Issue: #4
+	var firstvector = VectorN.from_packed_array([1,0,0,0])
+	assert(firstvector.dot(firstvector) == 1)
+	firstvector.set_element(2, 7)
+	firstvector.set_element(3, 5)
+	assert(firstvector.dot(VectorN.from_packed_array([1,2,3,4])) == 42)
 
 func _ready():
 	basic_regression_tests()

@@ -77,28 +77,12 @@ double VectorN::dot(Ref<VectorN> other) const {
 		return 0.0;
 	}
 	if (unlikely(other->values.size() != values.size())) {
-        ERR_PRINT_ED("ERROR: cannot find the dot product of vectors of incompatible sizes.");
+        ERR_PRINT_ED("ERROR: cannot compute the dot product of vectors of incompatible sizes.");
 		return 0.0;
     }
 	double result = 0.0;
 
-	int square_block = values.size() & ~(0b11);
-	// for the initial block that can be vectorised
-	for (int i = 0; i < square_block; i+=4) {
-		double a1,b1,c1,d1, a2,b2, c2, d2;
-		a1 = values[i];
-		b1 = values[i];
-		c1 = values[i];
-		d1 = values[i];
-		a2 = other->values[i];
-		b2 = other->values[i];
-		c2 = other->values[i];
-		d2 = other->values[i];
-
-		result += (a1*a2 + b1*b2) + (c1*c2 + d1*d2); // This is not yet vectorised, however, this avoids read-write conflicts. TODO: vectorise this
-	}
-	// for the remainder that cannot be vectorised easily
-	for (int i = square_block; i < values.size(); i++) {
+	for (int i = 0; i < values.size(); i++) {
 		result += values[i] * other->values[i];
 	}
 
