@@ -13,3 +13,4 @@
 /test_scene.scn      export-ignore
 /test_script.gd      export-ignore
 /addons/largelinearalgebra/godot-cpp export-ignore
+/addons/largelinearalgebra/src export-ignore

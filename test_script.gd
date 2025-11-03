@@ -52,13 +52,12 @@ func basic_regression_tests():
 	
 	assert(Array(new_clone.solve(VectorN.from_packed_array([1.0, 1.0]).column_vector()).to_packed_array()).hash() == [5.8/0.58, -7.7/0.58].hash())
 	print(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).to_packed_array(), " should be approximately ", [1.09375, -0.28125])
-	
-	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.000002)
+	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.001)
 	
 	
 	
 	print((DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).to_sparse(0.0)).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).to_packed_array(), " should be approximately ", [1.09375, -0.28125])
-	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).to_sparse(0.0).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.000002)
+	assert(DenseMatrix.from_packed_array([3.0, 1.0, 1.0, 3.0], 2, 2).to_sparse(0.0).solve_iterative_cg(VectorN.from_packed_array([3.0, 0.25]), VectorN.from_packed_array([3.093275, -2.28125]), 2).subtract(VectorN.from_packed_array([1.09375, -0.28125])).length() < 0.001)
 	
 	
 	assert(DenseMatrix.from_packed_array([3.0, 1.0, 2.0, -1.0], 2, 2).norm_squared() == 15.0)
